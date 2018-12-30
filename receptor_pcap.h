@@ -14,7 +14,12 @@ typedef struct
 
 void PacketRec(u_char *args, const struct pcap_pkthdr *header,const u_char *packet)
 {
-	printf("Jacked a packet with length of [%d]\n", header->len);
+	printf("[%05d] ", header->len);
+    for(int i=0;i<16;i++)
+    {
+        printf("%02x ",(uchar)packet[i]);
+    }
+    printf("\n");
     for(int i=0;i<g_receptors_num;i++)
     if(g_receptors[i].isRunning)
     {

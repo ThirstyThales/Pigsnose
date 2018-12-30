@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
+#include "protocol/ethernet.h"
 #include "receptor.h"
 #include "receptor_data.h"
 int g_receptors_num;
