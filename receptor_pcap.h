@@ -12,20 +12,28 @@ typedef struct
     bpf_u_int32 mask;
 }SPcapConfig;
 
+#define Change(x) ((((x) & 0x00ff) << 8 ) | (((x) & 0xff00) >> 8))
 void PacketRec(u_char *args, const struct pcap_pkthdr *header,const u_char *packet)
 {
     struct protocol_ethernet* p_eth
         =(struct protocol_ethernet*)packet;
+    if(!is_ipv4(p_eth))
+        return;
     struct protocol_ipv4* p_ipv4
         =(struct protocol_ipv4*)(packet+ethernet_size);
-    //struct protocol_tcp 
-	printf("[%05d] %d.%d.%d.%d -> %d.%d.%d.%d \n", header->len,
-            p_ipv4->src[0],p_ipv4->src[1],p_ipv4->src[2],p_ipv4->src[3],
-            p_ipv4->dst[0],p_ipv4->dst[1],p_ipv4->dst[2],p_ipv4->dst[3]);
+    if(!is_tcp(p_ipv4))
+        return;
+    struct protocol_tcp* p_tcp
+        =(struct protocol_tcp*)(packet+ethernet_size+ipv4_header_size(p_ipv4));
+    //if(!(p_tcp->dstport==443||p_tcp->dstport==80||p_tcp->dstport==8080))
+    //   return;
+	printf("[%05d] %hhu.%hhu.%hhu.%hhu:%hu -> %hhu.%hhu.%hhu.%hhu:%hu \n", header->len,
+            p_ipv4->src[0],p_ipv4->src[1],p_ipv4->src[2],p_ipv4->src[3],(unsigned short)Change(p_tcp->srcport),
+            p_ipv4->dst[0],p_ipv4->dst[1],p_ipv4->dst[2],p_ipv4->dst[3],(unsigned short)Change(p_tcp->dstport));
     printf("       ");
     for(int i=0;i<20;i++)
     {
-        printf("%02x ",*((byte*)p_ipv4+i));
+        printf("%02x ",*((byte*)p_tcp+i));
     }
     printf("\n");
     for(int i=0;i<g_receptors_num;i++)

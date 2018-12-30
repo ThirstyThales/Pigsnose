@@ -2,6 +2,7 @@
 #include <string.h>
 #include "protocol/ethernet.h"
 #include "protocol/ipv4.h"
+#include "protocol/tcp.h"
 #include "receptor.h"
 #include "receptor_data.h"
 int g_receptors_num;
