@@ -1,14 +1,16 @@
-#ifndef ETHERNET_H_H
-#define ETHERNET_H_H
-#ifndef uchar
-    typedef unsigned char uchar;
+#ifndef ETHERNET_H_H_
+#define ETHERNET_H_H_
+#ifndef byte_type
+    #define byte_type
+    typedef unsigned char byte;
+    typedef unsigned short word;
 #endif
 
 struct protocol_ethernet
 {
-    uchar dst[6];
-    uchar src[6];
-    uchar type[2];
+    byte dst[6];
+    byte src[6];
+    byte type[2];
 };
 #define ethernet_size (sizeof(struct protocol_ethernet))
 #define is_ipv4(eth) (((struct protocol_ethernet*)eth)->type[0]==0x08&&((struct protocol_ethernet*)eth)->type[1]==0x00)

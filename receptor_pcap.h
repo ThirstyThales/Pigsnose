@@ -14,10 +14,18 @@ typedef struct
 
 void PacketRec(u_char *args, const struct pcap_pkthdr *header,const u_char *packet)
 {
-	printf("[%05d] ", header->len);
-    for(int i=0;i<16;i++)
+    struct protocol_ethernet* p_eth
+        =(struct protocol_ethernet*)packet;
+    struct protocol_ipv4* p_ipv4
+        =(struct protocol_ipv4*)(packet+ethernet_size);
+    //struct protocol_tcp 
+	printf("[%05d] %d.%d.%d.%d -> %d.%d.%d.%d \n", header->len,
+            p_ipv4->src[0],p_ipv4->src[1],p_ipv4->src[2],p_ipv4->src[3],
+            p_ipv4->dst[0],p_ipv4->dst[1],p_ipv4->dst[2],p_ipv4->dst[3]);
+    printf("       ");
+    for(int i=0;i<20;i++)
     {
-        printf("%02x ",(uchar)packet[i]);
+        printf("%02x ",*((byte*)p_ipv4+i));
     }
     printf("\n");
     for(int i=0;i<g_receptors_num;i++)
