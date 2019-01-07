@@ -16,5 +16,6 @@ SReceptor* getReceptor(const char *name);
 void ReceptorSystemStartup();
 void ReceptorSystemShotdown();
 
+int showTCPIP;
 
 #endif

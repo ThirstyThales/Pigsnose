@@ -13,6 +13,16 @@ typedef struct
 }SPcapConfig;
 
 #define Change(x) ((((x) & 0x00ff) << 8 ) | (((x) & 0xff00) >> 8))
+
+void dataSerach(char *data,int size)
+{
+    data[size-1]='\0';
+    if(strstr(data,"password")!=NULL)
+    {
+        printf("%s\n\n",data);
+    }
+}
+
 void PacketRec(u_char *args, const struct pcap_pkthdr *header,const u_char *packet)
 {
     struct protocol_ethernet* p_eth
@@ -25,17 +35,21 @@ void PacketRec(u_char *args, const struct pcap_pkthdr *header,const u_char *pack
         return;
     struct protocol_tcp* p_tcp
         =(struct protocol_tcp*)(packet+ethernet_size+ipv4_header_size(p_ipv4));
-    //if(!(p_tcp->dstport==443||p_tcp->dstport==80||p_tcp->dstport==8080))
-    //   return;
-	printf("[%05d] %hhu.%hhu.%hhu.%hhu:%hu -> %hhu.%hhu.%hhu.%hhu:%hu \n", header->len,
-            p_ipv4->src[0],p_ipv4->src[1],p_ipv4->src[2],p_ipv4->src[3],(unsigned short)Change(p_tcp->srcport),
-            p_ipv4->dst[0],p_ipv4->dst[1],p_ipv4->dst[2],p_ipv4->dst[3],(unsigned short)Change(p_tcp->dstport));
-    printf("       ");
-    for(int i=0;i<20;i++)
-    {
-        printf("%02x ",*((byte*)p_tcp+i));
+    
+    unsigned int header_len=ethernet_size+ipv4_header_size(p_ipv4)+tcp_header_size(p_tcp);
+    int data_len= header->len - header_len;
+    if(data_len>0)
+    {    
+        char* data=(char*)(packet+header_len);
+        dataSerach(data,data_len);
     }
-    printf("\n");
+    if(showTCPIP)
+    {
+	    printf("[Len:%04d] %hhu.%hhu.%hhu.%hhu:%hu -> %hhu.%hhu.%hhu.%hhu:%hu \n", header->len,
+                p_ipv4->src[0],p_ipv4->src[1],p_ipv4->src[2],p_ipv4->src[3],(unsigned short)Change(p_tcp->srcport),
+                p_ipv4->dst[0],p_ipv4->dst[1],p_ipv4->dst[2],p_ipv4->dst[3],(unsigned short)Change(p_tcp->dstport));
+    }
+
     for(int i=0;i<g_receptors_num;i++)
     if(g_receptors[i].isRunning)
     {
