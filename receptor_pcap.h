@@ -17,7 +17,7 @@ typedef struct
 void dataSerach(char *data,int size)
 {
     data[size-1]='\0';
-    if(strstr(data,"password")!=NULL)
+    if(strstr(data,setSerachString)!=NULL)
     {
         printf("%s\n\n",data);
     }
@@ -59,7 +59,30 @@ void PacketRec(u_char *args, const struct pcap_pkthdr *header,const u_char *pack
 int openPcap(SPcapConfig *pcap)
 {
     char errbuf[PCAP_ERRBUF_SIZE];
-	pcap->dev = pcap_lookupdev(errbuf);//尝试打开默认网络设备
+	if(showDev)
+	{
+		pcap_if_t *devsp;
+		if(pcap_findalldevs(&devsp, errbuf)!=0)
+		{
+			fprintf(stderr, "Devices Error: %s\n", errbuf);
+			return -1;
+		}
+		printf("Devices:\n");
+		while(devsp!=NULL)
+		{
+			printf("  %s\t  \t%s\n",devsp->name,devsp->description);
+			devsp=devsp->next;
+		}
+		return 0;
+	}
+	if(setDevName==NULL)
+	{
+		pcap->dev = pcap_lookupdev(errbuf);//尝试打开默认网络设备
+	}
+	else
+	{
+		pcap->dev = setDevName;
+	}
 	if(pcap->dev == NULL)
     {
 		fprintf(stderr, "Device Error: %s\n", errbuf);
@@ -71,7 +94,6 @@ int openPcap(SPcapConfig *pcap)
 		pcap->net=0;
 		pcap->mask=0;
 	}
-
 	pcap->handle = pcap_open_live(pcap->dev, BUFSIZ, 1, 1000, errbuf);
 	if (pcap->handle == NULL) {
 		fprintf(stderr, "%s handle Error: %s\n", pcap->dev, errbuf);
@@ -82,8 +104,7 @@ int openPcap(SPcapConfig *pcap)
     {
         fprintf(stderr, "Enter loop failed.\n");
         return -1;
-    }
-	
+    }	
 	return 0;
 }
 int closePcap(SPcapConfig *pcap)

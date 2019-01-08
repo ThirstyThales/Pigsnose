@@ -17,5 +17,7 @@ void ReceptorSystemStartup();
 void ReceptorSystemShotdown();
 
 int showTCPIP;
-
+int showDev;
+char* setDevName;
+char* setSerachString;
 #endif
