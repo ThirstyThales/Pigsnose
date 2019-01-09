@@ -16,10 +16,15 @@ typedef struct
 
 void dataSerach(char *data,int size)
 {
-    data[size-1]='\0';
+    //data[size-1]='\0';
     if(strstr(data,setSerachString)!=NULL)
     {
-        printf("%s\n\n",data);
+        //printf("%s\n\n",data);
+		for(int i=0;i<size;i++)
+		{
+			printf("%c",data[i]);
+		}
+		printf("\n");
     }
 }
 
