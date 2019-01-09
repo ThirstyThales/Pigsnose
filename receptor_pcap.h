@@ -1,4 +1,4 @@
-#ifdef RECEPTOR_PCAP_H_H_
+﻿#ifdef RECEPTOR_PCAP_H_H_
     #error "receptor_pcap.h can't be included twice."
 #endif
 
@@ -12,6 +12,7 @@ typedef struct
     bpf_u_int32 mask;
 }SPcapConfig;
 
+//交换网络字节序
 #define Change(x) ((((x) & 0x00ff) << 8 ) | (((x) & 0xff00) >> 8))
 
 void dataSerach(char *data,int size)
@@ -32,11 +33,11 @@ void PacketRec(u_char *args, const struct pcap_pkthdr *header,const u_char *pack
 {
     struct protocol_ethernet* p_eth
         =(struct protocol_ethernet*)packet;
-    if(!is_ipv4(p_eth))
+    if(!is_ipv4(p_eth))//只检测ip协议
         return;
     struct protocol_ipv4* p_ipv4
         =(struct protocol_ipv4*)(packet+ethernet_size);
-    if(!is_tcp(p_ipv4))
+    if(!is_tcp(p_ipv4))//只检测tcp协议
         return;
     struct protocol_tcp* p_tcp
         =(struct protocol_tcp*)(packet+ethernet_size+ipv4_header_size(p_ipv4));
